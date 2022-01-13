@@ -1,0 +1,47 @@
+{% extends 'layout.html' %}
+{% block body %}
+<div class="container">
+
+    <br>
+    <h1>{{ogrenci["id"]}}</h2>
+    <h2>{{ogrenci["firstname"]+" "+ogrenci["lastname"]}}</h1>
+    <br>  
+
+
+    <table class="table table-striped">
+        <thead  class="table-dark">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Ders Adı</th>
+            <th scope="col">Puanı</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">1</th>
+            <td>Matematik</td>
+            <td>{{ogrenci["point"]}}</td>
+          </tr>
+        </tbody>
+      </table>
+
+
+    <br>
+    <div class="card-group">
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for i in range(0,2)  %}
+            <div class="col">
+              <div class="card h-100">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvqHyDPGnlnZRz5kgTX-QKqdS8fOxLAyOawA&usqp=CAU" class="card-img-top" alt="...">
+                <div class="card-body">
+                  <h5 class="card-title">Türkiye Rozeti</h5>
+                  <p class="card-text">Türkiye Cumhuriyeti</p>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+{% endblock body %}

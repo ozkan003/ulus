@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<br>
+<h3>Anasayfa</h3>
+<hr>
+<h6>Hoşgeldiniz</h6>
+<div>
+  <form method="POST">
+    {{form.hidden_tag()}}
+    {{form.text_area(class="form-control form-control-lg")}}
+    <br>
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      {{form.submit(class="btn btn-primary")}}
+    </div>
+
+  </form>
+</div>
+
+
+{% endblock  %}
