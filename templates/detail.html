@@ -1,0 +1,51 @@
+{% extends 'layout.html' %}
+{% block body %}
+<div class="container">
+  <br>
+  <h1>{{ogrenci.id}}</h1>
+  <h2>{{ogrenci.firstname+" "+ogrenci.lastname}}</h2>
+  <hr>
+
+    <table class="table table-striped">
+        <thead  class="table-dark">
+          <tr>
+            <th scope="col"><h5>#</h5></th>
+            <th scope="col"><h5>Ders Adı</h5></th>
+            <th scope="col"><h5>Puanı</h5></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row"><h5>1</h5></th>
+            <td><h5>Matematik</h5></td>
+            <td><h5>{{ogrenci["point"]}}</h5></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 class="pb-2 border-bottom">Kazanılan Rozetler</h2>
+  
+      <div class="row row-cols-1 row-cols-lg-3 align-items-stretch g-4 py-5">
+        {% for i in range(0,3)  %}
+        <div class="col">
+          <div class="card card-cover h-100 overflow-hidden text-white bg-dark rounded-5 shadow-lg" style="background-image: url('unsplash-photo-1.jpg');">
+            <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
+              <h2 class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold">Bu özellik henüz aktifleştirilmedi</h2>
+              <ul class="d-flex list-unstyled mt-auto">
+                <li class="me-auto">
+                  <img src="http://palu.meb.gov.tr/meb_iys_dosyalar/2019_12/09161911_Palu_MEM_Logo_Yeni_2019.jpg" alt="Bootstrap" width="48" height="48 " class="rounded-circle border border-white">
+                </li>
+
+                <li class="d-flex align-items-center">
+                  <svg class="bi me-2" width="1em" height="1em"><use xlink:href="#calendar3"></use></svg>
+                  <small>{{ogrenci.firstname+" "+ogrenci.lastname}}</small>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+        {% endfor %}
+      </div>
+
+{% endblock body %}

@@ -1,0 +1,85 @@
+{% extends 'layout.html' %}
+
+
+
+{% block body %}
+<br>
+<h3>Öğrenci Puan Paneli</h3>
+<hr>
+<h6>Hoşgeldiniz {{session["username"]}}
+<br>
+<br>
+
+
+{% if ogrenci_list %}
+<table class="table table-striped">
+    <thead  class="table-dark">
+    <tr>
+        <th scope="col"><h5>#</h5></th>
+        <th scope="col"><h5>Öğrenci Adı</h5></th>
+        <th scope="col"><h5>Puanı</h5></th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for i in ogrenci_list %}
+    <tr>
+        <th scope="row"><h5>{{i.id}}</h5></th>
+        <td><h5>{{i.firstname+" "+i.lastname}}</h5></td>
+        <td><h5>{{i.point}}</h5></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+
+<div>
+    <form method="POST">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <a href="/dashboard" class="btn btn-primary btn-lg" type="submit">Temizle</a>
+        <a href="/decrease/{{id}}" class="btn btn-danger btn-lg" type="submit">Puanı Azalt</a>
+        <a href="/increase/{{id}}" class="btn btn-success btn-lg" type="submit">Puanı Arttır</a>
+    </div>
+
+    </form>
+</div>
+
+{% endif %}
+
+
+{% if ogrenci %}
+
+<h1>{{ogrenci.id}}</h1>
+<h2>{{ogrenci.firstname+" "+ogrenci.lastname}}</h2>
+<hr>
+
+
+<table class="table table-striped">
+    <thead  class="table-dark">
+    <tr>
+        <th scope="col"><h5>#</h5></th>
+        <th scope="col"><h5>Öğrenci Adı</h5></th>
+        <th scope="col"><h5>Puanı</h5></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <th scope="row"><h5>{{ogrenci.id}}</h5></th>
+        <td><h5>{{ogrenci.firstname+" "+ogrenci.lastname}}</h5></td>
+        <td><h5>{{ogrenci.point}}</h5></td>
+    </tr>
+    </tbody>
+</table>
+
+<div>
+    <form method="POST">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <a href="/dashboard" class="btn btn-primary btn-lg" type="submit">Temizle</a>
+        <a href="/decrease/{{ogrenci.id}}" class="btn btn-danger btn-lg" type="submit">Puanı Azalt</a>
+        <a href="/increase/{{ogrenci.id}}" class="btn btn-success btn-lg" type="submit">Puanı Arttır</a>
+    </div>
+
+    </form>
+</div>
+    
+{% endif %}
+{% endblock body %}

@@ -1,11 +1,15 @@
+# Google Authenticator Kütüphanesi
+import pyotp
+
 from flask import Flask, render_template, redirect, url_for, session, logging, request
 from flask.helpers import flash
-from flask_mysqldb import MySQL
 from flask_wtf import FlaskForm
+from flask_sqlalchemy import SQLAlchemy
 from wtforms import Form, StringField, PasswordField, SubmitField, validators
 from passlib.hash import sha256_crypt
 from functools import wraps
 from datetime import timedelta
+
 
 # Kullanıcı Giriş Durumunu Kontrol Eden DEcoder Fonksiyonu
 
@@ -29,21 +33,33 @@ class LoginForm(Form):
 
 class SearchForm(FlaskForm):
     text_area = StringField("Ara", validators=[validators.DataRequired()])
-    submit = SubmitField("Gönder")
+    submit = SubmitField("Ara")
 
 
 # Flask app konfigürasyonları
 app = Flask(__name__)
 app.secret_key = "k!asdlLdkfjpS0FD*fsad"
-app.config["MYSQL_HOST"] = "localhost"
-app.config["MYSQL_USER"] = "root"
-app.config["MYSQL_PASSWORD"] = ""
-app.config["MYSQL_DB"] = "data"
-app.config["MYSQL_CURSORCLASS"] = "DictCursor"
-app.permanent_session_lifetime = timedelta(minutes=1)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////Users/relig/Desktop/puan/data.db'
+app.permanent_session_lifetime = timedelta(minutes=20)
 
 
-mysql = MySQL(app)
+db = SQLAlchemy(app)
+
+
+class student(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    firstname = db.Column(db.String)
+    lastname = db.Column(db.String)
+    point = db.Column(db.Integer)
+
+
+class users(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String)
+    firstname = db.Column(db.String)
+    lastname = db.Column(db.String)
+    email = db.Column(db.String)
+    secret_key = db.Column(db.String)
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -51,7 +67,7 @@ def index():
     form = SearchForm()
     if form.validate_on_submit():
         id = form.text_area.data
-        return redirect(url_for("student", id=id))
+        return redirect(url_for("detail", id=id))
     else:
         return render_template("index.html", form=form)
 
@@ -62,54 +78,34 @@ def dashboard():
     form = SearchForm()
     if form.validate_on_submit():
         id = form.text_area.data
-        # Virgül ile gelen id için çalışan koşul (POST request)
-        if "," in id:
-            liste = id.split(",")
-            len_list = len(liste)
-            liste = tuple(liste)
-            cursor = mysql.connection.cursor()
-            sorgu = "Select * from student where id in %s"
-            result = cursor.execute(sorgu, (liste,))
-
-            if result > 0:
-                ogrenci = cursor.fetchall()
-            else:
-                flash("Böyle Bir Öğrenci Bulunamadı!", "danger")
-                return redirect(url_for("index"))
-
-            cursor.close()
-            return render_template("dashboard.html", form=form, len_list=len_list, ogrenci=ogrenci)
-
-        # Virgülsüz gelen id için çalışan koşul (POST request)
-        else:
-            cursor = mysql.connection.cursor()
-            sorgu = "Select * from student where id=%s"
-            result = cursor.execute(sorgu, (id,))
-            if result > 0:
-                ogrenci = cursor.fetchone()
-            else:
-                flash("Böyle Bir Öğrenci Bulunamadı!", "danger")
-                return redirect(url_for("dashboard"))
-            cursor.close()
-            return render_template("dashboard.html", form=form, ogrenci=ogrenci, len_list=0)
+        return redirect("dashboard_detail/{}".format(id))
 
     # GET methodu ile dönen return
     return render_template("dashboard.html", form=form)
 
 
-@app.route("/student/<string:id>", methods=["GET"])
-def student(id):
+@app.route("/dashboard_detail/<string:id>", methods=["GET", "POST"])
+@login_required
+def dashboard_detail(id):
+    if "," in id:
+        liste = id.split(",")
+        liste = tuple(liste)
+        ogrenci_list = student.query.filter(student.id.in_(liste)).all()
+        return render_template("dashboard_detail.html", ogrenci_list=ogrenci_list, id=id)
+    else:
+        ogrenci = student.query.filter_by(id=id).first()
+        return render_template("dashboard_detail.html", ogrenci=ogrenci)
+
+
+@app.route("/detail/<string:id>", methods=["GET"])
+def detail(id):
     if request.method == 'GET':
-        cursor = mysql.connection.cursor()
-        sorgu = "Select * from student where id=%s"
-        result = cursor.execute(sorgu, (id,))
-        if result > 0:
-            ogrenci = cursor.fetchone()
-        else:
-            flash("Böyle Bir Öğrenci Bulunamadı!", "danger")
+        ogrenci = student.query.filter_by(id=id).first()
+        if ogrenci == None:
+            flash("Böyle bir öğrenci bulunmamaktadır!", "danger")
             return redirect(url_for("index"))
-        cursor.close()
-        return render_template("student.html", ogrenci=ogrenci)
+        else:
+            return render_template("detail.html", ogrenci=ogrenci)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -118,22 +114,15 @@ def login():
     if request.method == "POST":
         username = form.username.data
         password_entered = form.password.data
-
-        cursor = mysql.connection.cursor()
-
-        sorgu = "Select * From users where username = %s "
-
-        result = cursor.execute(sorgu, (username,))
-
-        if result > 0:
-            data = cursor.fetchone()
-            real_password = data["password"]
-            if sha256_crypt.verify(password_entered, real_password):
+        sorgu = users.query.filter_by(username=username).first()
+        totp = pyotp.TOTP(sorgu.secret_key)
+        if sorgu != None:
+            if totp.verify(password_entered):
                 flash("Başarıyla Giriş Yaptınız!", "success")
                 session["logged_in"] = True
                 session["username"] = username
-                session.permanent = True
-                session.modified = True
+                """session.permanent = True
+                session.modified = True"""
                 return redirect(url_for("dashboard"))
             else:
                 flash("Şifreniz Yanlış!", "danger")
@@ -153,62 +142,42 @@ def logout():
     return redirect(url_for("index"))
 
 
-@app.route("/increase/<string:id>", methods=["GET", "POST"])
+@app.route("/increase/<string:id>", methods=["GET"])
 @login_required
 def increase(id):
-    form = SearchForm()
-    form.text_area.data = id
-
     if "," in id:
         liste = id.split(",")
-        len_list = len(liste)
         liste = tuple(liste)
-        cursor = mysql.connection.cursor()
-        sorgu = "UPDATE student SET point=point+5 WHERE id in %s"
-        sorgu2 = "SELECT * from student WHERE id in %s"
-        cursor.execute(sorgu, (liste,))
-        mysql.connection.commit()
-        cursor.execute(sorgu2, (liste,))
-        ogrenci = cursor.fetchall()
-        return render_template("dashboard.html", form=form, ogrenci=ogrenci, len_list=len_list)
+        ogrenci_list = student.query.filter(student.id.in_(liste)).all()
+        for i in ogrenci_list:
+            i.point += 5
+        db.session.commit()
+        return redirect("/dashboard_detail/{}".format(id))
 
-    cursor = mysql.connection.cursor()
-    sorgu = "UPDATE student SET point=point+5 WHERE id=%s"
-    sorgu2 = "SELECT * from student WHERE id=%s"
-    cursor.execute(sorgu, (id,))
-    mysql.connection.commit()
-    cursor.execute(sorgu2, (id,))
-    ogrenci = cursor.fetchall()
-    return render_template("dashboard.html", form=form, ogrenci=ogrenci, len_list=1)
+    ogrenci = student.query.filter_by(id=id).first()
+    ogrenci.point += 5
+    db.session.commit()
+    return redirect("/dashboard_detail/{}".format(id))
 
 
-@app.route("/decrease/<string:id>", methods=["GET", "POST"])
+@app.route("/decrease/<string:id>", methods=["GET"])
 @login_required
 def decrease(id):
-    form = SearchForm()
-    form.text_area.data = id
     if "," in id:
         liste = id.split(",")
-        len_list = len(liste)
         liste = tuple(liste)
-        cursor = mysql.connection.cursor()
-        sorgu = "UPDATE student SET point=point-5 WHERE id in %s"
-        sorgu2 = "SELECT * from student WHERE id in %s"
-        cursor.execute(sorgu, (liste,))
-        mysql.connection.commit()
-        cursor.execute(sorgu2, (liste,))
-        ogrenci = cursor.fetchall()
-        return render_template("dashboard.html", form=form, ogrenci=ogrenci, len_list=len_list)
+        ogrenci_list = student.query.filter(student.id.in_(liste)).all()
+        for i in ogrenci_list:
+            i.point -= 5
+        db.session.commit()
+        return redirect("/dashboard_detail/{}".format(id))
 
-    cursor = mysql.connection.cursor()
-    sorgu = "UPDATE student SET point=point-5 WHERE id=%s"
-    sorgu2 = "SELECT * from student WHERE id=%s"
-    cursor.execute(sorgu, (id,))
-    mysql.connection.commit()
-    cursor.execute(sorgu2, (id,))
-    ogrenci = cursor.fetchall()
-    return render_template("dashboard.html", form=form, ogrenci=ogrenci, len_list=1)
+    ogrenci = student.query.filter_by(id=id).first()
+    ogrenci.point -= 5
+    db.session.commit()
+    return redirect("/dashboard_detail/{}".format(id))
 
 
 if __name__ == "__main__":
+    db.create_all()
     app.run(debug=True)
