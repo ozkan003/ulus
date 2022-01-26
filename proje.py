@@ -38,7 +38,7 @@ class SearchForm(FlaskForm):
 # Flask app konfigürasyonları
 app = Flask(__name__)
 app.secret_key = "k!asdlLdkfjpS0FD*fsad"
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////Users/relig/Desktop/puan/data.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////data.db'
 app.permanent_session_lifetime = timedelta(minutes=20)
 
 
