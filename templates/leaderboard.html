@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+{% block body %}
+<div class="mt-5">
+    <table class="table table-hover">
+        <thead>
+          <tr class="table-dark">
+            <th scope="col">#</th>
+            <th scope="col">Adı</th>
+            <th scope="col">Soyadı</th>
+            <th scope="col">Puanı</th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for i in ogrenci %}
+            <tr>
+                <th class="table-light" scope="row">{{i.id}}</th>
+                <td class="table-light" >{{i.firstname}}</td>
+                <td class="table-light" >{{i.lastname}}</td>
+                <td class="table-light" >{{i.point}}</td>
+              </tr>
+            {% endfor %}
+        </tbody>
+      </table>
+</div>
+{% endblock body %}
+

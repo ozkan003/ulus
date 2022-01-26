@@ -1,12 +1,11 @@
 # Google Authenticator Kütüphanesi
 import pyotp
 
-from flask import Flask, render_template, redirect, url_for, session, logging, request
+from flask import Flask, render_template, redirect, url_for, session, request
 from flask.helpers import flash
 from flask_wtf import FlaskForm
 from flask_sqlalchemy import SQLAlchemy
 from wtforms import Form, StringField, PasswordField, SubmitField, validators
-from passlib.hash import sha256_crypt
 from functools import wraps
 from datetime import timedelta
 
@@ -87,8 +86,8 @@ def dashboard():
 @app.route("/dashboard_detail/<string:id>", methods=["GET", "POST"])
 @login_required
 def dashboard_detail(id):
-    if "," in id:
-        liste = id.split(",")
+    if " " in id:
+        liste = id.split(" ")
         liste = tuple(liste)
         ogrenci_list = student.query.filter(student.id.in_(liste)).all()
         return render_template("dashboard_detail.html", ogrenci_list=ogrenci_list, id=id)
@@ -115,8 +114,8 @@ def login():
         username = form.username.data
         password_entered = form.password.data
         sorgu = users.query.filter_by(username=username).first()
-        totp = pyotp.TOTP(sorgu.secret_key)
         if sorgu != None:
+            totp = pyotp.TOTP(sorgu.secret_key)
             if totp.verify(password_entered):
                 flash("Başarıyla Giriş Yaptınız!", "success")
                 session["logged_in"] = True
@@ -145,8 +144,8 @@ def logout():
 @app.route("/increase/<string:id>", methods=["GET"])
 @login_required
 def increase(id):
-    if "," in id:
-        liste = id.split(",")
+    if " " in id:
+        liste = id.split(" ")
         liste = tuple(liste)
         ogrenci_list = student.query.filter(student.id.in_(liste)).all()
         for i in ogrenci_list:
@@ -163,8 +162,8 @@ def increase(id):
 @app.route("/decrease/<string:id>", methods=["GET"])
 @login_required
 def decrease(id):
-    if "," in id:
-        liste = id.split(",")
+    if " " in id:
+        liste = id.split(" ")
         liste = tuple(liste)
         ogrenci_list = student.query.filter(student.id.in_(liste)).all()
         for i in ogrenci_list:
@@ -177,7 +176,11 @@ def decrease(id):
     db.session.commit()
     return redirect("/dashboard_detail/{}".format(id))
 
+@app.route("/leaderboard", methods=["GET"])
+def leaderboard():
+    ogrenci = student.query.order_by(student.point.desc()).limit(10)
+    return render_template("leaderboard.html",ogrenci=ogrenci)
 
 if __name__ == "__main__":
     db.create_all()
-    app.run()
+    app.run(debug=True)

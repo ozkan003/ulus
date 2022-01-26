@@ -24,28 +24,21 @@
       </table>
 
       <h2 class="pb-2 border-bottom">Kazanılan Rozetler</h2>
-  
-      <div class="row row-cols-1 row-cols-lg-3 align-items-stretch g-4 py-5">
-        {% for i in range(0,3)  %}
-        <div class="col">
-          <div class="card card-cover h-100 overflow-hidden text-white bg-dark rounded-5 shadow-lg" style="background-image: url('unsplash-photo-1.jpg');">
-            <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
-              <h2 class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold">Bu özellik henüz aktifleştirilmedi</h2>
-              <ul class="d-flex list-unstyled mt-auto">
-                <li class="me-auto">
-                  <img src="http://palu.meb.gov.tr/meb_iys_dosyalar/2019_12/09161911_Palu_MEM_Logo_Yeni_2019.jpg" alt="Bootstrap" width="48" height="48 " class="rounded-circle border border-white">
-                </li>
-
-                <li class="d-flex align-items-center">
-                  <svg class="bi me-2" width="1em" height="1em"><use xlink:href="#calendar3"></use></svg>
-                  <small>{{ogrenci.firstname+" "+ogrenci.lastname}}</small>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        
-        {% endfor %}
+      <div class="row row-cols-1 row-cols-lg-3 align-items-stretch g-4 py-2">
+        {% if ogrenci.point >= 100 %}
+        {% include "medals/level1.html" %}
+        {% include "medals/level2.html" %}
+        {% include "medals/level3.html" %}
+        {% include "medals/level4.html" %}
+        {% elif ogrenci.point >= 75 %}
+        {% include "medals/level1.html" %}
+        {% include "medals/level2.html" %}
+        {% include "medals/level3.html" %}
+        {% elif ogrenci.point >= 50 %}
+        {% include "medals/level1.html" %}
+        {% include "medals/level2.html" %}
+        {% elif ogrenci.point >= 25 %}
+        {% include "medals/level1.html" %}
+        {% endif %}
       </div>
-
 {% endblock body %}

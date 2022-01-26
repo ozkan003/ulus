@@ -1,17 +1,44 @@
-{% extends 'layout.html' %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Giriş Yap</title>
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.1/examples/sign-in/">
 
-{% block body %}
-{% from "includes/formhelpers.html" import render_field %}
-<br>
-<h3>Giriş Yap</h3>
-<hr>
+    
 
-<form method="post">
-    <dl>
-      {{ render_field(form.username) }}
-      {{ render_field(form.password) }}
-    </dl>
-    <button type="submit" class="btn btn-primary btn-lg">Giriş Yap</button>
+    <!-- Bootstrap core CSS -->
+  <link href="https://getbootstrap.com/docs/5.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+
+    <!-- Custom styles for this template -->
+  <link href="https://getbootstrap.com/docs/5.1/examples/sign-in/signin.css" rel="stylesheet">
+  </head>
+  
+  <body class="text-center">
+  {% from "includes/formhelpers.html" import render_field %}
+    
+<main class="form-signin">
+  <div>
+    {% include "includes/messages.html" %}
+  </div>
+  <form method="POST">
+    <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="currentColor" class="bi bi-bar-chart-steps" viewBox="0 0 16 16">
+      <path d="M.5 0a.5.5 0 0 1 .5.5v15a.5.5 0 0 1-1 0V.5A.5.5 0 0 1 .5 0zM2 1.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-4a.5.5 0 0 1-.5-.5v-1zm2 4a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-1zm2 4a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-6a.5.5 0 0 1-.5-.5v-1zm2 4a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-1z"/>
+    </svg>    <h1 class="h3 mb-3 fw-normal">Lütfen Giriş Yapınız</h1>
+    <div class="form-floating">
+      <input name="username" type="text" class="form-control" id="floatingInput" placeholder="Kullancı Adı">
+      <label for="floatingInput">Kullanıcı Adı</label>
+    </div>
+    <div class="form-floating">
+      <input name="password" type="password" class="form-control" id="floatingPassword" placeholder="Şifre">
+      <label for="floatingPassword">Şifre</label>
+    </div>
+    <br>
+    <button class="w-100 btn btn-lg btn-primary" type="submit">Giriş Yap</button>
+    <p class="mt-5 mb-3 text-muted">&copy; Özkan - 2022</p>
   </form>
-
-{% endblock body %}
+</main>
+  </body>
+</html>
